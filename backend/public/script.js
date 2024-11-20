@@ -6,7 +6,7 @@ const joinOptions = document.getElementById('join-options');
 const gameSection = document.getElementById('game-section');
 const currentLobbySpan = document.getElementById('current-lobby');
 const currentTurnSpan = document.getElementById('current-turn'); // Add this line
-
+const API_BASE_URL = "https://five-in-a-row-ahwe.onrender.com";
 let gameOver = false;
 let gameId = null;
 let userId = Math.random().toString(36).substring(2, 9);
@@ -32,7 +32,7 @@ async function createLobby() {
         return;
     }
 
-    const response = await fetch('https://five-in-a-row-ahwe.onrender.com:10000/api/create-lobby', {
+    const response = await fetch(`${API_BASE_URL}/api/create-lobby`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, nickname })  // Pass userId and nickname
@@ -53,7 +53,7 @@ async function joinLobby() {
         return;
     }
 
-    const response = await fetch('https://five-in-a-row-ahwe.onrender.com:10000/api/join-lobby', {
+    const response = await fetch(`${API_BASE_URL}/api/join-lobby`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lobby: lobbyId, userId, nickname })
@@ -106,7 +106,7 @@ async function makeMove(column) {
             return;
         }
 
-        const response = await fetch('https://five-in-a-row-ahwe.onrender.com:10000/api/make-a-move', {
+        const response = await fetch(`${API_BASE_URL}/api/make-a-move`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lobby: gameId, userId, cell: column })
@@ -182,7 +182,7 @@ function pollBoardState() {
 }
 
 async function fetchBoardState() {
-    const response = await fetch(`https://five-in-a-row-ahwe.onrender.com:10000/api/game-state/${gameId}`);
+    const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
     const data = await response.json();
     if (data.board) {
         renderBoard(data.board, data);
