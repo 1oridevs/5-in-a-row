@@ -46,27 +46,34 @@ async function createLobby() {
 
 
 async function joinLobby() {
-    const lobbyId = document.getElementById('lobbyIdInput').value;
-    nickname = document.getElementById('nicknameInput').value;
+    const lobbyId = document.getElementById('lobbyIdInput').value; // Get the lobby ID
+    nickname = document.getElementById('joinNicknameInput').value; // Get the nickname
+
     if (!lobbyId || !nickname) {
         alert("Please enter a lobby ID and nickname");
         return;
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/join-lobby`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lobby: lobbyId, userId, nickname })
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/join-lobby`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lobby: lobbyId, userId, nickname })
+        });
 
-    const data = await response.json();
-    if (data.error) {
-        alert(data.error);
-    } else {
-        gameId = lobbyId;
-        showGameSection();
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error); // Show error if lobby join fails
+        } else {
+            gameId = lobbyId;
+            showGameSection();
+        }
+    } catch (error) {
+        console.error("Error joining lobby:", error);
     }
 }
+
 
 function showGameSection() {
     lobbySection.style.display = 'none';
