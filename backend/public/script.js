@@ -25,23 +25,28 @@ function selectOption(option) {
 }
 
 async function createLobby() {
-    userId = Math.random().toString(36).substring(2, 9);  // Generate a unique user ID
-    nickname = document.getElementById('nicknameInput').value;
+    userId = Math.random().toString(36).substring(2, 9); // Generate a unique user ID
+    nickname = document.getElementById('hostNicknameInput').value; // Use the host nickname input
+
     if (!nickname) {
         alert("Please enter a nickname");
         return;
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/create-lobby`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, nickname })  // Pass userId and nickname
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/create-lobby`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, nickname }) // Pass userId and nickname
+        });
 
-    const data = await response.json();
-    gameId = data.lobbyId;
-    alert(`Lobby created with ID: ${gameId}`);
-    showGameSection();
+        const data = await response.json();
+        gameId = data.lobbyId;
+        alert(`Lobby created with ID: ${gameId}`);
+        showGameSection();
+    } catch (error) {
+        console.error("Error creating lobby:", error);
+    }
 }
 
 

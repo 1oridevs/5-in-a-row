@@ -10,7 +10,7 @@ exports.createLobby = (req, res) => {
         return res.status(400).json({ error: "User ID and nickname are required to create a lobby." });
     }
 
-    const lobbyId = Date.now().toString();
+    const lobbyId = Math.floor(100000 + Math.random() * 900000).toString();
     lobbies[lobbyId] = {
         board: Array(6).fill().map(() => Array(7).fill(" ")),
         players: { [userId]: nickname }, // Add creator as the first player
