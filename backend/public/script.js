@@ -32,7 +32,7 @@ async function createLobby() {
         return;
     }
 
-    const response = await fetch('http://localhost:5000/api/create-lobby', {
+    const response = await fetch('https://five-in-a-row-ahwe.onrender.com:10000/api/create-lobby', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, nickname })  // Pass userId and nickname
@@ -53,7 +53,7 @@ async function joinLobby() {
         return;
     }
 
-    const response = await fetch('http://localhost:5000/api/join-lobby', {
+    const response = await fetch('https://five-in-a-row-ahwe.onrender.com:10000/api/join-lobby', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lobby: lobbyId, userId, nickname })
@@ -106,7 +106,7 @@ async function makeMove(column) {
             return;
         }
 
-        const response = await fetch('http://localhost:5000/api/make-a-move', {
+        const response = await fetch('https://five-in-a-row-ahwe.onrender.com:10000/api/make-a-move', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lobby: gameId, userId, cell: column })
@@ -182,7 +182,7 @@ function pollBoardState() {
 }
 
 async function fetchBoardState() {
-    const response = await fetch(`http://localhost:5000/api/game-state/${gameId}`);
+    const response = await fetch(`https://five-in-a-row-ahwe.onrender.com:10000/api/game-state/${gameId}`);
     const data = await response.json();
     if (data.board) {
         renderBoard(data.board, data);
