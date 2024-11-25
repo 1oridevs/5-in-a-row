@@ -2,7 +2,7 @@ import requests
 import time
 import os
 
-API_BASE_URL = "https://five-in-a-row-ahwe.onrender.com"
+API_BASE_URL = "https://five-in-a-row-ahwe.onrender.com/api"
 
 class FiveInARowClient:
     def __init__(self):
@@ -163,7 +163,7 @@ class FiveInARowClient:
 
     def show_about(self):
         self.clear_console()
-        print("===== About 4 in a Row =====\nA strategic game where the first to align 4 blocks in a row wins!")
+        print("===== About 4 in a Row =====\nA strategic game where the first to align 4 blocks in a row wins! \nCreated by the smartest guy in the room")
         input("\nPress Enter to return to the main menu.")
 
 if __name__ == "__main__":
