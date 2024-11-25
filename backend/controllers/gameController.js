@@ -158,13 +158,15 @@ exports.getGameState = (req, res) => {
     const game = lobbies[lobby];
     if (!game) return res.status(404).json({ error: "Lobby not found" });
 
-    // Return the game state, including the win message
     res.json({
         board: game.board,
         currentPlayer: game.currentPlayer,
         players: game.players,
-        message: game.winMessage || null, // Include win message if available
+        gameOver: game.gameOver || false,
+        winner: game.winner || null, // Add winner info if game is over
+        timestamp: Date.now(), // Add timestamp for state updates
     });
 };
+
 
 
