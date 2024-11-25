@@ -42,13 +42,14 @@
         <!-- Game Board -->
         <div id="board"></div>
         <!-- Winner Popup Modal -->
-<div id="winnerModal" class="modal">
+<!-- Winner Notification Modal -->
+<div id="winnerModal" class="modal" style="display: none;">
     <div class="modal-content">
-        <span class="close-button" onclick="closeModal()">&times;</span>
         <h2 id="winnerMessage"></h2>
-        <button onclick="joinLobby()">Play Again</button>
+        <button onclick="resetGame()">Play Again</button>
     </div>
 </div>
+
 <!-- Winner Notification Banner -->
 <div id="winnerBanner" class="banner" style="display: none;">
     <h2 id="winnerText"></h2>
