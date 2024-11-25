@@ -170,6 +170,10 @@ function getPlayerColor(userId) {
 // Function to render the game board
 function renderBoard(board, data) {
     boardElement.innerHTML = '';
+    const playerList = document.getElementById('player-list');
+    playerList.innerHTML = ''; // Clear existing players
+
+    // Render the game board
     board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
             const cellDiv = document.createElement('div');
@@ -187,7 +191,15 @@ function renderBoard(board, data) {
             boardElement.appendChild(cellDiv);
         });
     });
+
+    // Update the player list in the sidebar
+    for (const [userId, nickname] of Object.entries(data.players)) {
+        const playerItem = document.createElement('li');
+        playerItem.textContent = nickname;
+        playerList.appendChild(playerItem);
+    }
 }
+
 
 function pollBoardState() {
     setInterval(fetchBoardState, 1000);
@@ -218,5 +230,7 @@ async function fetchBoardState() {
         console.error("Error fetching game state:", error);
     }
 }
+
+
 
 

@@ -106,7 +106,7 @@ exports.makeMove = (req, res) => {
     const game = lobbies[lobby];
 
     if (!game) return res.status(404).json({ error: "Lobby not found" });
-    
+
     // Prevent moves if the game is over
     if (game.gameOver) {
         return res.status(400).json({ error: "Game is over. Please start a new game." });
@@ -137,14 +137,22 @@ exports.makeMove = (req, res) => {
         const winnerName = game.players[userId];
         game.gameOver = true;
         console.log(`Player ${winnerName} has won the game!`);
-        return res.json({ board: game.board, message: `${winnerName} wins!` });
+        return res.json({
+            board: game.board,
+            players: game.players, // Include players for frontend rendering
+            message: `${winnerName} wins!`
+        });
     }
-    
 
     // Switch turns if no win is detected
     game.currentPlayer = Object.keys(game.players).find(p => p !== userId);
-    res.json({ board: game.board, currentPlayer: game.currentPlayer });
+    res.json({
+        board: game.board,
+        players: game.players, // Include players for frontend rendering
+        currentPlayer: game.currentPlayer
+    });
 };
+
 
 
 
