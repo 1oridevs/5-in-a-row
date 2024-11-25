@@ -85,9 +85,11 @@ function showGameSection() {
     gameSection.style.display = 'block';
     currentLobbySpan.textContent = gameId;
 
-    renderBoard(Array(6).fill().map(() => Array(7).fill(" ")));
+    // Pass an empty players object initially
+    renderBoard(Array(6).fill().map(() => Array(7).fill(" ")), { players: {} });
     pollBoardState();
 }
+
 
 function test() {
     console.log("TEST")
@@ -173,6 +175,9 @@ function renderBoard(board, data) {
     const playerList = document.getElementById('player-list');
     playerList.innerHTML = ''; // Clear existing players
 
+    // Safely handle cases where data.players might be undefined
+    const players = data.players || {};
+
     // Render the game board
     board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
@@ -182,7 +187,7 @@ function renderBoard(board, data) {
             // Set the cell's background color and text based on the player
             if (cell !== " ") {
                 cellDiv.style.backgroundColor = getPlayerColor(cell); // Get color for the userId
-                cellDiv.textContent = data.players[cell]; // Display the nickname instead of userId
+                cellDiv.textContent = players[cell] || cell; // Display the nickname if available
             } else {
                 cellDiv.textContent = "";
             }
@@ -193,7 +198,7 @@ function renderBoard(board, data) {
     });
 
     // Update the player list in the sidebar
-    for (const [userId, nickname] of Object.entries(data.players)) {
+    for (const [userId, nickname] of Object.entries(players)) {
         const playerItem = document.createElement('li');
         playerItem.textContent = nickname;
         playerList.appendChild(playerItem);
