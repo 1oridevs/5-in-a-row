@@ -136,37 +136,35 @@ exports.makeMove = (req, res) => {
     if (checkWin(board, userId)) {
         const winnerName = game.players[userId];
         game.gameOver = true;
+        game.winMessage = `${winnerName} wins!`; // Persist win message for all players
         console.log(`Player ${winnerName} has won the game!`);
-        return res.json({
-            board: game.board,
-            players: game.players, // Include players for frontend rendering
-            message: `${winnerName} wins!`
-        });
     }
 
     // Switch turns if no win is detected
-    game.currentPlayer = Object.keys(game.players).find(p => p !== userId);
+    if (!game.gameOver) {
+        game.currentPlayer = Object.keys(game.players).find(p => p !== userId);
+    }
+
     res.json({
         board: game.board,
-        players: game.players, // Include players for frontend rendering
-        currentPlayer: game.currentPlayer
+        currentPlayer: game.currentPlayer,
+        message: game.winMessage || null, // Include win message if applicable
     });
 };
 
 
-
-
-
-// 4. Get Game State
 exports.getGameState = (req, res) => {
     const { lobby } = req.params;
     const game = lobbies[lobby];
     if (!game) return res.status(404).json({ error: "Lobby not found" });
-    
-    // Return both the board and the current player's ID
+
+    // Return the game state, including the win message
     res.json({
         board: game.board,
         currentPlayer: game.currentPlayer,
-        players: game.players
+        players: game.players,
+        message: game.winMessage || null, // Include win message if available
     });
 };
+
+

@@ -103,6 +103,7 @@ function showWinnerPopup(message) {
     modal.style.display = 'block';
 }
 
+
 function closeModal() {
     const modal = document.getElementById('winnerModal');
     modal.style.display = 'none';
@@ -225,16 +226,18 @@ async function fetchBoardState() {
             currentTurnSpan.textContent = data.players[data.currentPlayer] || "Unknown";
         }
 
-        // Check if the game is over and display an alert
+        // Show the win message for all players
         if (data.message && !gameOver) {
-            gameOver = true; // Prevent duplicate alerts
-            alert(data.message); // Show the win message
-            showWinnerPopup(data.message); // Optional: Show the winner in a popup
+            gameOver = true; // Ensure popup shows only once
+            showWinnerPopup(data.message); // Display the win message
         }
     } catch (error) {
         console.error("Error fetching game state:", error);
     }
 }
+
+
+
 
 
 
