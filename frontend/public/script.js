@@ -90,9 +90,6 @@ function showGameSection() {
     pollBoardState();
 }
 
-function test() {
-    console.log("TEST")
-}
 
 function showWinnerPopup(message) {
     const modal = document.getElementById('winnerModal');
@@ -190,6 +187,7 @@ function renderBoard(board, data) {
     });
 }
 
+
 function pollBoardState() {
     setInterval(fetchBoardState, 1000);
 }
@@ -208,8 +206,10 @@ async function fetchBoardState() {
     }
 
     // Check if the game is over
-    if (data.message) {
+    if (data.message && !gameOver) { // Only show alert once
         gameOver = true;
+        alert(data.message);
+
     }
 }
 
