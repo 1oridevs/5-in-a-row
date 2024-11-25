@@ -194,23 +194,29 @@ function pollBoardState() {
 }
 
 async function fetchBoardState() {
-    const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
-    const data = await response.json();
-    if (data.board) {
-        renderBoard(data.board, data);
-    }
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
+        const data = await response.json();
 
-    // Display the current turn by nickname
-    if (data.currentPlayer && data.players) {
-        currentTurn = data.currentPlayer;
-        currentTurnSpan.textContent = data.players[data.currentPlayer] || "Unknown";
-    }
+        if (data.board) {
+            renderBoard(data.board, data);
+        }
 
-    // Check if the game is over
-    if (data.message && !gameOver) { // Only show alert once
-        gameOver = true;
-        alert(data.message);
+        // Display the current turn by nickname
+        if (data.currentPlayer && data.players) {
+            currentTurn = data.currentPlayer;
+            currentTurnSpan.textContent = data.players[data.currentPlayer] || "Unknown";
+        }
 
+        // Check if the game is over and display an alert
+        if (data.message && !gameOver) {
+            gameOver = true; // Prevent duplicate alerts
+            alert(data.message); // Show the win message
+            showWinnerPopup(data.message); // Optional: Show the winner in a popup
+        }
+    } catch (error) {
+        console.error("Error fetching game state:", error);
     }
 }
+
 
