@@ -1,5 +1,5 @@
 const express = require('express');
-const { createLobby, joinLobby, makeMove, getGameState } = require('../controllers/gameController');
+const { createLobby, joinLobby, makeMove, getGameState, checkTimer, addSpectator} = require('../controllers/gameController');
 const router = express.Router();
 
 router.post('/create-lobby', createLobby);
