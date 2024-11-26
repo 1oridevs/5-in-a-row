@@ -32,6 +32,7 @@
     <div id="game-section" style="display: none;">
         <h2>Lobby: <span id="current-lobby"></span></h2>
         <h3>Current Turn: <span id="current-turn"></span></h3>
+        <h4>Time Remaining: <span id="timer">30s</span></h4> <!-- Timer Added -->
 
         <!-- Sidebar for connected players -->
         <div id="sidebar" class="sidebar">
@@ -41,21 +42,14 @@
 
         <!-- Game Board -->
         <div id="board"></div>
-        <!-- Winner Popup Modal -->
-<!-- Winner Notification Modal -->
-<div id="winnerModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <h2 id="winnerMessage"></h2>
-        <button onclick="resetGame()">Play Again</button>
-    </div>
-</div>
 
-<!-- Winner Notification Banner -->
-<div id="winnerBanner" class="banner" style="display: none;">
-    <h2 id="winnerText"></h2>
-</div>
-
-
+        <!-- Winner Notification Modal -->
+        <div id="winnerModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2 id="winnerMessage"></h2>
+                <button onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

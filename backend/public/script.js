@@ -208,33 +208,42 @@ function renderBoard(board, data) {
 
 
 function pollBoardState() {
-    setInterval(fetchBoardState, 1000);
+    setInterval(async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
+            const data = await response.json();
+
+            if (data.board) {
+                renderBoard(data.board, data);
+            }
+
+            // Update turn and timer display
+            if (data.currentPlayer && data.players) {
+                currentTurn = data.currentPlayer;
+                currentTurnSpan.textContent = data.players[data.currentPlayer] || "Unknown";
+            }
+
+            if (data.moveDeadline) {
+                const timerElement = document.getElementById('timer');
+                const timeRemaining = Math.max(0, Math.floor((data.moveDeadline - Date.now()) / 1000));
+                timerElement.textContent = `${timeRemaining}s`;
+
+                // Alert for timer expiry
+                if (timeRemaining === 0) {
+                    alert("Time expired! Turn has been switched.");
+                }
+            }
+
+            if (data.message && !gameOver) {
+                gameOver = true;
+                showWinnerPopup(data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching game state:", error);
+        }
+    }, 1000);
 }
 
-async function fetchBoardState() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
-        const data = await response.json();
-
-        if (data.board) {
-            renderBoard(data.board, data);
-        }
-
-        // Display the current turn by nickname
-        if (data.currentPlayer && data.players) {
-            currentTurn = data.currentPlayer;
-            currentTurnSpan.textContent = data.players[data.currentPlayer] || "Unknown";
-        }
-
-        // Show the win message for all players
-        if (data.message && !gameOver) {
-            gameOver = true; // Ensure popup shows only once
-            showWinnerPopup(data.message); // Display the win message
-        }
-    } catch (error) {
-        console.error("Error fetching game state:", error);
-    }
-}
 
 
 

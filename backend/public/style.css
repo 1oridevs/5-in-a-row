@@ -154,3 +154,15 @@ button:hover {
     text-align: center;
     border-radius: 10px;
 }
+/* Timer Display Styling */
+h4 {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #ff6347; /* Red for urgency */
+}
+
+#timer {
+    font-weight: bold;
+    color: #ff4500;
+    font-size: 20px;
+}
