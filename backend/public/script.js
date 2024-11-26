@@ -78,7 +78,18 @@ async function joinLobby() {
         console.error("Error joining lobby:", error);
     }
 }
+const playerColors = {};
 
+// Function to assign a unique color to each player
+function getPlayerColor(userId) {
+    if (!playerColors[userId]) {
+        // Assign a color based on the number of players
+        const colors = ['#6a5acd', '#ffa07a', '#ff6347', '#3cb371']; // Add more colors if needed
+        const colorIndex = Object.keys(playerColors).length % colors.length;
+        playerColors[userId] = colors[colorIndex];
+    }
+    return playerColors[userId];
+}
 
 function showGameSection() {
     lobbySection.style.display = 'none';
@@ -186,19 +197,6 @@ function resetGame() {
 }
 
 
-// Color dictionary for players
-const playerColors = {};
-
-// Function to assign a unique color to each player
-function getPlayerColor(userId) {
-    if (!playerColors[userId]) {
-        // Assign a color based on the number of players
-        const colors = ['#6a5acd', '#ffa07a', '#ff6347', '#3cb371']; // Add more colors if needed
-        const colorIndex = Object.keys(playerColors).length % colors.length;
-        playerColors[userId] = colors[colorIndex];
-    }
-    return playerColors[userId];
-}
 
 // Function to render the game board
 function renderBoard(board, data) {
@@ -239,38 +237,51 @@ function renderBoard(board, data) {
 
 let isWaiting = true;
 
-async function pollBoardState() {
-    setInterval(async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
-            const data = await response.json();
+async function fetchBoardState() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
+        const data = await response.json();
 
-            if (isWaiting && data.currentPlayer) {
-                isWaiting = false;
-                alert("The game is starting!");
-            }
+        if (data.board) {
+            renderBoard(data.board, data); // Render the updated board
+        }
 
-            if (data.board) renderBoard(data.board, data);
+        if (data.gameOver) {
+            gameOver = true; // Stop further updates
+            showWinnerPopup(data.winner);
+            return; // Exit early since game is over
+        }
 
-            if (data.currentPlayer && data.players) {
-                currentTurn = data.currentPlayer;
-                currentTurnSpan.textContent = data.players[data.currentPlayer] || "Waiting for a player";
-            }
+        // Update the current turn
+        if (data.currentPlayer && data.players) {
+            currentTurn = data.currentPlayer;
+            currentTurnSpan.textContent = data.players[data.currentPlayer] || "Waiting...";
+        }
 
-            if (data.moveDeadline) {
-                const timeRemaining = Math.max(0, Math.floor((data.moveDeadline - Date.now()) / 1000));
-                timerElement.textContent = `${timeRemaining}s`;
-            }
+        // Update the timer
+        if (data.moveDeadline) {
+            const timerElement = document.getElementById('timer');
+            const timeRemaining = Math.max(0, Math.floor((data.moveDeadline - Date.now()) / 1000));
+            timerElement.textContent = `${timeRemaining}s`;
+        }
+    } catch (error) {
+        console.error("Error fetching game state:", error);
+    }
+}
 
-            if (data.message && !gameOver) {
-                gameOver = true;
-                showWinnerPopup(data.message);
-            }
-        } catch (error) {
-            console.error("Error fetching game state:", error);
+
+
+function pollBoardState() {
+    const interval = setInterval(() => {
+        if (gameOver) {
+            clearInterval(interval); // Stop polling if game is over
+        } else {
+            fetchBoardState();
         }
     }, 1000);
 }
+
+
 
 
 

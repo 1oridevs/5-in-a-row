@@ -12,9 +12,9 @@ exports.createLobby = (req, res) => {
     lobbies[lobbyId] = {
         board: Array(6).fill().map(() => Array(7).fill(" ")),
         players: { [userId]: nickname },
-        spectators: [],
+        spectators: {}, // Initialize spectators as an object
         currentPlayer: null, // Game starts only when a second player joins
-        moveDeadline: null,
+        moveDeadline: null, // No move deadline until the game starts
         gameOver: false,
         winMessage: null,
     };
@@ -26,24 +26,37 @@ exports.createLobby = (req, res) => {
 // Join an existing lobby
 exports.joinLobby = (req, res) => {
     const { lobby, userId, nickname } = req.body;
-    const game = lobbies[lobby];
 
+    const game = lobbies[lobby];
     if (!game) {
         return res.status(404).json({ error: "Lobby not found" });
     }
 
+    if (game.gameOver) {
+        return res.status(400).json({ error: "Cannot join. The game is already over." });
+    }
+
     if (Object.keys(game.players).length < 2) {
         game.players[userId] = nickname;
+
+        // Start the game when the second player joins
+        if (Object.keys(game.players).length === 2) {
+            game.currentPlayer = Object.keys(game.players)[0]; // Set the first player as current
+            game.moveDeadline = Date.now() + 30000; // Start 30-second timer
+            console.log("Game started!");
+        }
+
         console.log(`Player joined: Lobby ID: ${lobby}, User ID: ${userId}, Nickname: ${nickname}`);
-        game.currentPlayer = Object.keys(game.players)[0]; // First player gets the turn
-        game.moveDeadline = Date.now() + 30000; // Start timer
         return res.json({ message: "Joined as player", lobbyId: lobby });
     }
 
-    game.spectators.push({ userId, nickname });
+    // Add as a spectator
+    game.spectators[userId] = nickname;
     console.log(`Spectator joined: Lobby ID: ${lobby}, User ID: ${userId}, Nickname: ${nickname}`);
-    res.json({ message: "Joined as spectator", lobbyId: lobby });
+    return res.json({ message: "Joined as spectator", lobbyId: lobby });
 };
+
+
 
 // Make a move
 exports.makeMove = (req, res) => {
@@ -52,21 +65,14 @@ exports.makeMove = (req, res) => {
 
     if (!game) return res.status(404).json({ error: "Lobby not found" });
 
-    // Prevent moves if the game is over
     if (game.gameOver) {
-        return res.status(400).json({ error: "Game is over." });
+        return res.status(400).json({ error: "Game is over. No moves allowed." });
     }
 
-    // Check if the user is a spectator
     if (!game.players[userId]) {
-        if (game.spectators.some(spectator => spectator.userId === userId)) {
-            return res.status(403).json({ error: "You are not playing!" });
-        } else {
-            return res.status(403).json({ error: "Unknown user." });
-        }
+        return res.status(403).json({ error: "You are a spectator. You cannot make a move." });
     }
 
-    // Check if it's the player's turn
     if (game.currentPlayer !== userId) {
         return res.status(403).json({ error: "It's not your turn!" });
     }
@@ -74,12 +80,10 @@ exports.makeMove = (req, res) => {
     const board = game.board;
     const column = cell;
 
-    // Check if the column is full
     if (board[0][column] !== " ") {
         return res.status(400).json({ error: "Column is full" });
     }
 
-    // Drop the disk in the specified column
     for (let row = board.length - 1; row >= 0; row--) {
         if (board[row][column] === " ") {
             board[row][column] = userId;
@@ -87,16 +91,13 @@ exports.makeMove = (req, res) => {
         }
     }
 
-    // Check for a win
     if (checkWin(board, userId)) {
-        const winnerName = game.players[userId];
         game.gameOver = true;
-        game.winMessage = `${winnerName} wins!`;
+        game.winMessage = `${game.players[userId]} wins!`;
         console.log(game.winMessage);
     } else {
-        // Switch turns
         game.currentPlayer = Object.keys(game.players).find(p => p !== userId);
-        game.moveDeadline = Date.now() + 30000; // Reset timer
+        game.moveDeadline = Date.now() + 30000;
     }
 
     res.json({
@@ -163,3 +164,25 @@ function checkWin(board, userId) {
 
     return false;
 }
+
+exports.getGameState = (req, res) => {
+    const { lobby } = req.params;
+    const game = lobbies[lobby];
+
+    if (!game) {
+        return res.status(404).json({ error: "Lobby not found" });
+    }
+
+    res.json({
+        board: game.board,
+        currentPlayer: game.currentPlayer,
+        players: game.players,
+        spectators: game.spectators || {}, // Include spectators in the state
+        gameOver: game.gameOver || false,
+        winner: game.winner || null,
+        moveDeadline: game.gameOver ? null : game.moveDeadline || Date.now(),
+        });
+};
+
+
+
