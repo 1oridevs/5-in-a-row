@@ -7,5 +7,6 @@ router.post('/join-lobby', joinLobby);
 router.post('/make-a-move', makeMove);
 router.get('/game-state/:lobby', getGameState);
 router.get('/check-timer/:lobby', checkTimer);
+router.post('/add-spectator', addSpectator);
 
 module.exports = router;

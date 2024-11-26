@@ -166,3 +166,21 @@ h4 {
     color: #ff4500;
     font-size: 20px;
 }
+#spectators {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: left;
+}
+
+#spectator-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#spectator-list li {
+    font-size: 16px;
+    margin-bottom: 5px;
+}

@@ -24,8 +24,16 @@
         <div id="join-options" style="display: none;">
             <input type="text" id="lobbyIdInput" placeholder="Enter Lobby ID">
             <input type="text" id="joinNicknameInput" placeholder="Enter Nickname">
-            <button onclick="joinLobby()">Join Lobby</button>
-        </div>        
+            <button onclick="joinLobby()">Join as Player</button>
+            <button onclick="joinAsSpectator()">Join as Spectator</button>
+        </div>
+        
+        <!-- Spectator List -->
+        <div id="spectators" style="display: none;">
+            <h3>Spectators</h3>
+            <ul id="spectator-list"></ul>
+        </div>
+             
     </div>
 
     <!-- Game Section -->
