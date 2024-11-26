@@ -6,7 +6,7 @@ const joinOptions = document.getElementById('join-options');
 const gameSection = document.getElementById('game-section');
 const currentLobbySpan = document.getElementById('current-lobby');
 const currentTurnSpan = document.getElementById('current-turn'); // Add this line
-const API_BASE_URL = "https://five-in-a-row-ahwe.onrender.com";
+const API_BASE_URL = "http://localhost:5001";
 let gameOver = false;
 let gameId = null;
 let userId = Math.random().toString(36).substring(2, 9);
@@ -85,15 +85,11 @@ function showGameSection() {
     gameSection.style.display = 'block';
     currentLobbySpan.textContent = gameId;
 
-    // Pass an empty players object initially
     renderBoard(Array(6).fill().map(() => Array(7).fill(" ")), { players: {} });
     pollBoardState();
 }
 
 
-function test() {
-    console.log("TEST")
-}
 
 function showWinnerPopup(message) {
     const modal = document.getElementById('winnerModal');
@@ -111,26 +107,26 @@ function closeModal() {
 
 async function makeMove(column) {
     if (gameOver) {
-        console.log("Game is already over!");
+        alert("The game is already over!");
+        return;
+    }
+
+    if (userId !== currentTurn) {
+        alert("It's not your turn!");
         return;
     }
 
     try {
-        if (userId !== currentTurn) {
-            alert("It's not your turn!");
-            return;
-        }
-
         const response = await fetch(`${API_BASE_URL}/api/make-a-move`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lobby: gameId, userId, cell: column })
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lobby: gameId, userId, cell: column }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            console.error(`Error making move: ${data.error}`);
+            alert(data.error);
             return;
         }
 
@@ -138,16 +134,15 @@ async function makeMove(column) {
             renderBoard(data.board, data);
         }
 
-        // Show the winner popup if there's a win
         if (data.message) {
-            console.log(`Frontend: ${data.message}`);
-            showWinnerPopup(data.message);
             gameOver = true;
+            showWinnerPopup(data.message);
         }
     } catch (error) {
         console.error("Error making move:", error);
     }
 }
+
 
 async function joinAsSpectator() {
     const lobbyId = document.getElementById('lobbyIdInput').value;
@@ -242,34 +237,29 @@ function renderBoard(board, data) {
 }
 
 
-function pollBoardState() {
+let isWaiting = true;
+
+async function pollBoardState() {
     setInterval(async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
             const data = await response.json();
 
-            if (data.board) {
-                renderBoard(data.board, data);
-            }
-            if (data.spectators) {
-                updateSpectatorsList(data.spectators);
+            if (isWaiting && data.currentPlayer) {
+                isWaiting = false;
+                alert("The game is starting!");
             }
 
-            // Update turn and timer display
+            if (data.board) renderBoard(data.board, data);
+
             if (data.currentPlayer && data.players) {
                 currentTurn = data.currentPlayer;
-                currentTurnSpan.textContent = data.players[data.currentPlayer] || "Unknown";
+                currentTurnSpan.textContent = data.players[data.currentPlayer] || "Waiting for a player";
             }
 
             if (data.moveDeadline) {
-                const timerElement = document.getElementById('timer');
                 const timeRemaining = Math.max(0, Math.floor((data.moveDeadline - Date.now()) / 1000));
                 timerElement.textContent = `${timeRemaining}s`;
-
-                // Alert for timer expiry
-                if (timeRemaining === 0) {
-                    alert("Time expired! Turn has been switched.");
-                }
             }
 
             if (data.message && !gameOver) {
@@ -282,15 +272,7 @@ function pollBoardState() {
     }, 1000);
 }
 
-function updateSpectatorsList(spectators) {
-    const spectatorList = document.getElementById('spectator-list');
-    spectatorList.innerHTML = ''; // Clear existing spectators
 
-    for (const nickname of Object.values(spectators)) {
-        const spectatorItem = document.createElement('li');
-        spectatorItem.textContent = nickname;
-        spectatorList.appendChild(spectatorItem);
-    }
-}
+
 
 
