@@ -203,3 +203,32 @@ exports.checkTimer = (req, res) => {
 };
 
 
+exports.addSpectator = (req, res) => {
+    const { lobby, userId, nickname } = req.body;
+
+    const game = lobbies[lobby];
+    if (!game) return res.status(404).json({ error: "Lobby not found" });
+
+    if (!game.spectators) game.spectators = {};
+
+    game.spectators[userId] = nickname;
+    console.log(`Spectator joined: Lobby ID: ${lobby}, User ID: ${userId}, Nickname: ${nickname}`);
+    
+    res.json({ message: "Joined as a spectator", lobbyId: lobby });
+};
+
+exports.getGameState = (req, res) => {
+    const { lobby } = req.params;
+    const game = lobbies[lobby];
+    if (!game) return res.status(404).json({ error: "Lobby not found" });
+
+    res.json({
+        board: game.board,
+        currentPlayer: game.currentPlayer,
+        players: game.players,
+        spectators: game.spectators || {}, // Include spectators
+        gameOver: game.gameOver || false,
+        winner: game.winner || null,
+        timestamp: Date.now(),
+    });
+};

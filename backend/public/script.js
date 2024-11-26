@@ -149,6 +149,41 @@ async function makeMove(column) {
     }
 }
 
+async function joinAsSpectator() {
+    const lobbyId = document.getElementById('lobbyIdInput').value;
+    nickname = document.getElementById('joinNicknameInput').value;
+
+    if (!lobbyId || !nickname) {
+        alert("Please enter a lobby ID and nickname");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/add-spectator`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lobby: lobbyId, userId, nickname })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+        } else {
+            gameId = lobbyId;
+            showSpectatorMode();
+        }
+    } catch (error) {
+        console.error("Error joining as spectator:", error);
+    }
+}
+
+function showSpectatorMode() {
+    lobbySection.style.display = 'none';
+    gameSection.style.display = 'block';
+    currentLobbySpan.textContent = gameId;
+    pollBoardState();
+}
 
 function resetGame() {
     closeModal();
@@ -216,6 +251,9 @@ function pollBoardState() {
             if (data.board) {
                 renderBoard(data.board, data);
             }
+            if (data.spectators) {
+                updateSpectatorsList(data.spectators);
+            }
 
             // Update turn and timer display
             if (data.currentPlayer && data.players) {
@@ -244,10 +282,15 @@ function pollBoardState() {
     }, 1000);
 }
 
+function updateSpectatorsList(spectators) {
+    const spectatorList = document.getElementById('spectator-list');
+    spectatorList.innerHTML = ''; // Clear existing spectators
 
-
-
-
-
+    for (const nickname of Object.values(spectators)) {
+        const spectatorItem = document.createElement('li');
+        spectatorItem.textContent = nickname;
+        spectatorList.appendChild(spectatorItem);
+    }
+}
 
 
