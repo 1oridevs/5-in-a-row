@@ -13,9 +13,14 @@ exports.createLobby = (req, res) => {
     const lobbyId = Math.floor(100000 + Math.random() * 900000).toString();
     lobbies[lobbyId] = {
         board: Array(6).fill().map(() => Array(7).fill(" ")),
-        players: { [userId]: nickname }, // Add creator as the first player
-        currentPlayer: userId
+        players: { [userId]: nickname },
+        currentPlayer: userId,
+        moveDeadline: Date.now() + 30000, // 30 seconds for the first move
+        gameOver: false,
+        winMessage: null,
     };
+    
+    
 
     console.log(`Lobby created with ID: ${lobbyId}`);
     console.log(`Player joined: Lobby ID: ${lobbyId}, User ID: ${userId}, Nickname: ${nickname}`);
@@ -111,7 +116,13 @@ exports.makeMove = (req, res) => {
     if (game.gameOver) {
         return res.status(400).json({ error: "Game is over. Please start a new game." });
     }
-
+    if (Date.now() > game.moveDeadline) {
+        game.gameOver = true;
+        const winnerId = Object.keys(game.players).find(p => p !== userId); // Opponent wins
+        game.winMessage = `${game.players[winnerId]} wins! (Time out)`;
+        return res.status(400).json({ error: "Time out! Game over.", board: game.board, message: game.winMessage });
+    }
+    
     if (game.currentPlayer !== userId) {
         return res.status(403).json({ error: "Not your turn" });
     }
@@ -143,12 +154,14 @@ exports.makeMove = (req, res) => {
     // Switch turns if no win is detected
     if (!game.gameOver) {
         game.currentPlayer = Object.keys(game.players).find(p => p !== userId);
+        game.moveDeadline = Date.now() + 30000;
     }
 
     res.json({
         board: game.board,
         currentPlayer: game.currentPlayer,
-        message: game.winMessage || null, // Include win message if applicable
+        message: game.winMessage || null,
+        moveDeadline: game.moveDeadline
     });
 };
 
@@ -168,5 +181,25 @@ exports.getGameState = (req, res) => {
     });
 };
 
+exports.checkTimer = (req, res) => {
+    const { lobby } = req.params;
+    const game = lobbies[lobby];
+
+    if (!game) return res.status(404).json({ error: "Lobby not found" });
+
+    if (Date.now() > game.moveDeadline && !game.gameOver) {
+        // Switch the turn if the timer expires
+        game.currentPlayer = Object.keys(game.players).find(p => p !== game.currentPlayer);
+        game.moveDeadline = Date.now() + 30000; // Reset timer
+    }
+
+    res.json({
+        board: game.board,
+        currentPlayer: game.currentPlayer,
+        moveDeadline: game.moveDeadline,
+        gameOver: game.gameOver,
+        message: game.winMessage || null,
+    });
+};
 
 
