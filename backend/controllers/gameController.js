@@ -184,5 +184,30 @@ exports.getGameState = (req, res) => {
         });
 };
 
+// Join as a spectator
+exports.joinAsSpectator = (req, res) => {
+    const { lobby, userId, nickname } = req.body;
+
+    const game = lobbies[lobby];
+    if (!game) {
+        return res.status(404).json({ error: "Lobby not found" });
+    }
+
+    if (game.gameOver) {
+        return res.status(400).json({ error: "Cannot spectate. The game is already over." });
+    }
+
+    // Check if the user is already a player
+    if (game.players[userId]) {
+        return res.status(400).json({ error: "You are already a player in this game." });
+    }
+
+    // Add user as a spectator
+    game.spectators[userId] = nickname;
+    console.log(`Spectator joined: Lobby ID: ${lobby}, User ID: ${userId}, Nickname: ${nickname}`);
+
+    return res.json({ message: "Joined as spectator", lobbyId: lobby });
+};
+
 
 

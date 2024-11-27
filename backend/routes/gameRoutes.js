@@ -4,7 +4,8 @@ const {
     joinLobby,
     makeMove,
     checkTimer,
-    getGameState
+    getGameState,
+    joinAsSpectator
 } = require('../controllers/gameController');
 
 const router = express.Router();
@@ -14,4 +15,6 @@ router.post('/join-lobby', joinLobby);
 router.post('/make-a-move', makeMove);
 router.get('/check-timer/:lobby', checkTimer);
 router.get('/game-state/:lobby', getGameState);
+router.post('/add-spectator', joinAsSpectator);
+
 module.exports = router;
