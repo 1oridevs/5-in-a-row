@@ -6,6 +6,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    overflow: hidden; /* Prevent horizontal scrolling */
 }
 
 #lobby-section, #game-section {
@@ -14,6 +15,8 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
+    max-width: 100%; /* Allow scaling on small devices */
+    overflow-x: auto; /* Enable horizontal scrolling if necessary */
 }
 
 input {
@@ -21,7 +24,7 @@ input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 200px;
+    width: 80%; /* Scale input to fit smaller screens */
 }
 
 button {
@@ -38,27 +41,27 @@ button:hover {
     background-color: #45a049;
 }
 
-
 /* Style for the game section layout */
 #game-section {
     display: flex;
     align-items: flex-start;
+    flex-direction: column; /* Stack elements vertically on small screens */
 }
 
 /* Sidebar styling */
 .sidebar {
-    width: 200px;
-    margin-right: 20px;
+    width: 100%; /* Use full width on mobile */
+    margin-bottom: 10px;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 5px;
-    height: fit-content; /* Adjust to fit content */
 }
 
 .sidebar h3 {
     margin-top: 0;
     font-size: 18px;
+    text-align: center;
 }
 
 #player-list {
@@ -74,26 +77,25 @@ button:hover {
 /* Game board styling */
 #board {
     display: grid;
-    grid-template-columns: repeat(15, 40px); /* Adjusted for 15 columns */
-    grid-template-rows: repeat(15, 40px); /* Adjusted for 15 rows */
-    gap: 5px;
-    margin-top: 20px;
+    grid-template-columns: repeat(15, 1fr); /* Flexible columns */
+    gap: 2px; /* Reduced gap for smaller screens */
+    max-width: 100%; /* Prevent overflow */
+    margin: 10px auto;
 }
 
 .cell {
-    width: 40px; /* Adjusted size */
-    height: 40px; /* Adjusted size */
+    width: 100%; /* Dynamic size based on grid */
+    aspect-ratio: 1; /* Maintain square cells */
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 14px; /* Adjust font size for smaller cells */
+    font-size: 10px; /* Adjust font size for smaller cells */
     background-color: #d3d3d3;
     border: 1px solid #ccc;
 }
-
 
 /* Modal styles */
 .modal {
@@ -113,7 +115,7 @@ button:hover {
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 50%;
+    width: 80%; /* Adjust width for smaller screens */
     text-align: center;
     border-radius: 10px;
 }
@@ -129,32 +131,13 @@ button:hover {
 .close-button:hover {
     color: #000;
 }
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6); /* Black background with transparency */
-}
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 50%;
-    text-align: center;
-    border-radius: 10px;
-}
 /* Timer Display Styling */
 h4 {
     font-size: 18px;
     margin: 10px 0;
     color: #ff6347; /* Red for urgency */
+    text-align: center;
 }
 
 #timer {
@@ -162,6 +145,8 @@ h4 {
     color: #ff4500;
     font-size: 20px;
 }
+
+/* Spectator styling */
 #spectators {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -187,4 +172,43 @@ h4 {
     font-weight: bold;
     color: orange;
     text-align: center;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    #board {
+        grid-template-columns: repeat(15, 20px); /* Smaller cells */
+        gap: 1px;
+    }
+
+    .cell {
+        font-size: 8px; /* Reduce font size further */
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    input {
+        width: 90%; /* Utilize more space on mobile */
+    }
+
+    #timer {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    #board {
+        grid-template-columns: repeat(15, 15px); /* Adjust for very small screens */
+    }
+
+    .cell {
+        font-size: 6px;
+    }
+
+    #game-section {
+        flex-direction: column;
+    }
 }
