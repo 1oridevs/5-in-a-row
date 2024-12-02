@@ -10,7 +10,7 @@ exports.createLobby = (req, res) => {
 
     const lobbyId = Math.floor(100000 + Math.random() * 900000).toString();
     lobbies[lobbyId] = {
-        board: Array(6).fill().map(() => Array(7).fill(" ")),
+        board: Array(15).fill().map(() => Array(15).fill(" ")),
         players: { [userId]: nickname },
         spectators: {}, // Initialize spectators as an object
         currentPlayer: null, // Game starts only when a second player joins

@@ -207,6 +207,10 @@ function renderBoard(board, data) {
     // Safely handle cases where data.players might be undefined
     const players = data.players || {};
 
+    // Update CSS grid template for 15x15 grid
+    boardElement.style.gridTemplateColumns = `repeat(15, 40px)`; // Set column size
+    boardElement.style.gridTemplateRows = `repeat(15, 40px)`; // Set row size
+
     // Render the game board
     board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
@@ -233,6 +237,7 @@ function renderBoard(board, data) {
         playerList.appendChild(playerItem);
     }
 }
+
 
 
 let isWaiting = true;
