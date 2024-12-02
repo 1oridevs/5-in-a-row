@@ -38,26 +38,6 @@ button:hover {
     background-color: #45a049;
 }
 
-#board {
-    display: grid;
-    grid-template-columns: repeat(7, 60px);
-    gap: 5px;
-    margin-top: 20px;
-}
-
-.cell {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 20px;
-    background-color: #d3d3d3;
-    border: 1px solid #ccc;
-}
 
 /* Style for the game section layout */
 #game-section {
@@ -94,10 +74,26 @@ button:hover {
 /* Game board styling */
 #board {
     display: grid;
-    grid-template-columns: repeat(7, 60px);
+    grid-template-columns: repeat(15, 40px); /* Adjusted for 15 columns */
+    grid-template-rows: repeat(15, 40px); /* Adjusted for 15 rows */
     gap: 5px;
     margin-top: 20px;
 }
+
+.cell {
+    width: 40px; /* Adjusted size */
+    height: 40px; /* Adjusted size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px; /* Adjust font size for smaller cells */
+    background-color: #d3d3d3;
+    border: 1px solid #ccc;
+}
+
 
 /* Modal styles */
 .modal {
