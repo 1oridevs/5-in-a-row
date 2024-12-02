@@ -15,8 +15,8 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 100%; /* Allow scaling on small devices */
-    overflow-x: auto; /* Enable horizontal scrolling if necessary */
+    max-width: 100%; /* Scale for smaller screens */
+    overflow-x: auto; /* Allow horizontal scrolling if necessary */
 }
 
 input {
@@ -24,7 +24,7 @@ input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 80%; /* Scale input to fit smaller screens */
+    width: 80%; /* Scale input width for smaller screens */
 }
 
 button {
@@ -41,11 +41,11 @@ button:hover {
     background-color: #45a049;
 }
 
-/* Style for the game section layout */
+/* Game section layout */
 #game-section {
     display: flex;
     align-items: flex-start;
-    flex-direction: column; /* Stack elements vertically on small screens */
+    flex-direction: column; /* Stack elements vertically on smaller screens */
 }
 
 /* Sidebar styling */
@@ -84,7 +84,7 @@ button:hover {
 }
 
 .cell {
-    width: 100%; /* Dynamic size based on grid */
+    width: 100%; /* Dynamic width based on grid */
     aspect-ratio: 1; /* Maintain square cells */
     display: flex;
     justify-content: center;
@@ -174,15 +174,14 @@ h4 {
     text-align: center;
 }
 
-/* Responsive Design for Smaller Screens */
-@media (max-width: 768px) {
+/* Responsive Design for Medium Screens */
+@media (max-width: 1024px) {
     #board {
-        grid-template-columns: repeat(15, 20px); /* Smaller cells */
-        gap: 1px;
+        grid-template-columns: repeat(15, minmax(20px, 1fr)); /* Adjust columns for medium screens */
     }
 
     .cell {
-        font-size: 8px; /* Reduce font size further */
+        font-size: 8px; /* Smaller font for medium screens */
     }
 
     button {
@@ -191,24 +190,32 @@ h4 {
     }
 
     input {
-        width: 90%; /* Utilize more space on mobile */
+        width: 90%; /* Utilize more space */
+    }
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    #board {
+        grid-template-columns: repeat(15, 1fr); /* Smaller columns */
     }
 
-    #timer {
-        font-size: 16px;
+    .cell {
+        font-size: 6px; /* Reduce font size further */
+    }
+
+    #game-section {
+        flex-direction: column;
     }
 }
 
 @media (max-width: 480px) {
     #board {
-        grid-template-columns: repeat(15, 15px); /* Adjust for very small screens */
+        grid-template-columns: repeat(15, 20px); /* Adjust for very small screens */
+        gap: 1px; /* Reduce gap */
     }
 
     .cell {
-        font-size: 6px;
-    }
-
-    #game-section {
-        flex-direction: column;
+        font-size: 6px; /* Minimize font size */
     }
 }
