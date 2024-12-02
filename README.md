@@ -48,8 +48,14 @@ A multiplayer online game of 4-in-a-Row with support for spectators, timers, and
 
 ---
 
-Feel free to contribute, report issues, or suggest new features. Happy gaming!
+## API Documentation
+
+For details on the API endpoints exposed by the server, including function descriptions and sample usage, refer to the [API Documentation](./usage.md).
 
 ---
 
-## https://five-in-a-row-ahwe.onrender.com
+Feel free to contribute, report issues, or suggest new features. Happy Coding!
+
+---
+
+## [Play the Game](https://five-in-a-row-ahwe.onrender.com)
