@@ -93,6 +93,7 @@ exports.makeMove = (req, res) => {
 
     if (checkWin(board, userId)) {
         game.gameOver = true;
+        game.winner = userId; // Set the winner
         game.winMessage = `${game.players[userId]} wins!`;
         console.log(game.winMessage);
     } else {
@@ -137,7 +138,7 @@ exports.checkTimer = (req, res) => {
 function checkWin(board, userId) {
     const height = board.length;
     const width = board[0].length;
-    const target = 4;
+    const target = 5; // Changed from 4 to 5
 
     const checkLine = (line) => {
         let count = 0;
@@ -148,22 +149,43 @@ function checkWin(board, userId) {
         return false;
     };
 
+    // Check rows
     for (let row = 0; row < height; row++) if (checkLine(board[row])) return true;
+    // Check columns
     for (let col = 0; col < width; col++) if (checkLine(board.map(row => row[col]))) return true;
 
-    for (let row = 0; row < height - target + 1; row++) {
-        for (let col = 0; col < width - target + 1; col++) {
-            const diagonal1 = [], diagonal2 = [];
+    // Check diagonals
+    for (let row = 0; row < height; row++) {
+        for (let col = 0; col < width; col++) {
+            // Check diagonal down-right
+            let count = 0;
             for (let i = 0; i < target; i++) {
-                diagonal1.push(board[row + i][col + i]);
-                diagonal2.push(board[row + i][col + target - 1 - i]);
+                if (row + i < height && col + i < width && board[row + i][col + i] === userId) {
+                    count++;
+                    if (count === target) return true;
+                } else {
+                    break;
+                }
             }
-            if (checkLine(diagonal1) || checkLine(diagonal2)) return true;
+            // Check diagonal up-right
+            count = 0;
+            for (let i = 0; i < target; i++) {
+                if (row - i >= 0 && col + i < width && board[row - i][col + i] === userId) {
+                    count++;
+                    if (count === target) return true;
+                } else {
+                    break;
+                }
+            }
         }
     }
 
     return false;
 }
+
+
+    
+
 
 exports.getGameState = (req, res) => {
     const { lobby } = req.params;

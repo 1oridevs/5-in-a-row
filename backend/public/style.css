@@ -1,30 +1,19 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background: #f9f9f9;
+    color: #333;
+}
+
+h1, h2, h3, h4 {
     margin: 0;
-    overflow: hidden; /* Prevent horizontal scrolling */
-}
-
-#lobby-section, #game-section {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 100%; /* Scale for smaller screens */
-    overflow-x: auto; /* Allow horizontal scrolling if necessary */
-}
-
-input {
-    margin: 10px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 80%; /* Scale input width for smaller screens */
 }
 
 button {
@@ -34,188 +23,247 @@ button {
     padding: 10px 20px;
     margin: 10px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 button:hover {
     background-color: #45a049;
 }
 
-/* Game section layout */
-#game-section {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: column; /* Stack elements vertically on smaller screens */
-}
-
-/* Sidebar styling */
-.sidebar {
-    width: 100%; /* Use full width on mobile */
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-}
-
-.sidebar h3 {
-    margin-top: 0;
-    font-size: 18px;
-    text-align: center;
-}
-
-#player-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-#player-list li {
-    font-size: 16px;
-    margin-bottom: 5px;
-}
-
-/* Game board styling */
-#board {
-    display: grid;
-    grid-template-columns: repeat(15, 1fr); /* Flexible columns */
-    gap: 2px; /* Reduced gap for smaller screens */
-    max-width: 100%; /* Prevent overflow */
-    margin: 10px auto;
-}
-
-.cell {
-    width: 100%; /* Dynamic width based on grid */
-    aspect-ratio: 1; /* Maintain square cells */
+/* Popup Styling */
+#popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 10px; /* Adjust font size for smaller cells */
-    background-color: #d3d3d3;
-    border: 1px solid #ccc;
+    z-index: 10;
 }
 
-/* Modal styles */
-.modal {
-    display: none; /* Hidden by default */
+#popup h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#popup button {
+    font-size: 18px;
+}
+
+/* Lobby Section */
+#lobby-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+#lobby-section input {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Game Section */
+#game-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+#game-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#game-header h2, #game-header h3, #game-header h4 {
+    margin: 10px 0;
+}
+
+/* Game Layout */
+#game-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+#sidebar {
+    flex: 1;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+}
+#waitingPopup {
     position: fixed;
-    z-index: 1;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6); /* Black background with transparency */
+    display: none; /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+    z-index: 10;
 }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
+#waitingPopup .modal-content {
+    background: #fff;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Adjust width for smaller screens */
+    border-radius: 8px;
     text-align: center;
-    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.close-button {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #aaa;
-}
-
-.close-button:hover {
-    color: #000;
-}
-
-/* Timer Display Styling */
-h4 {
+#waitingMessage {
     font-size: 18px;
-    margin: 10px 0;
-    color: #ff6347; /* Red for urgency */
-    text-align: center;
-}
-
-#timer {
+    color: #444;
     font-weight: bold;
-    color: #ff4500;
-    font-size: 20px;
 }
 
-/* Spectator styling */
-#spectators {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-    text-align: left;
+
+#sidebar h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
 }
 
-#spectator-list {
-    list-style-type: none;
+#sidebar ul {
+    list-style: none;
     padding: 0;
 }
 
-#spectator-list li {
-    font-size: 16px;
-    margin-bottom: 5px;
+#sidebar li {
+    background: #f1f1f1;
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
-/* Waiting message styling */
-#waiting-message {
-    font-size: 16px;
+/* Board Container */
+#board-container {
+    flex: 2;
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    max-height: 80vh;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    gap: 4px;
+    width: 100%;
+    aspect-ratio: 1; /* Ensure square grid */
+}
+
+.cell {
+    background: #e0e0e0;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
     font-weight: bold;
-    color: orange;
+    cursor: pointer;
+    aspect-ratio: 1; /* Ensure square cells */
+}
+
+.cell:hover {
+    background: #d0d0d0;
+}
+
+/* Winner Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
     text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Responsive Design for Medium Screens */
+.modal-content h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.modal-content button {
+    font-size: 16px;
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
+    #game-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
     #board {
-        grid-template-columns: repeat(15, minmax(20px, 1fr)); /* Adjust columns for medium screens */
+        grid-template-columns: repeat(15, 1fr);
     }
 
-    .cell {
-        font-size: 8px; /* Smaller font for medium screens */
-    }
-
-    button {
-        font-size: 14px;
-        padding: 8px 16px;
-    }
-
-    input {
-        width: 90%; /* Utilize more space */
+    #sidebar {
+        max-width: 100%;
+        margin-bottom: 20px;
     }
 }
 
-/* Responsive Design for Small Screens */
 @media (max-width: 768px) {
     #board {
-        grid-template-columns: repeat(15, 1fr); /* Smaller columns */
+        gap: 2px;
     }
 
     .cell {
-        font-size: 6px; /* Reduce font size further */
+        font-size: 10px;
     }
 
-    #game-section {
-        flex-direction: column;
+    #sidebar {
+        font-size: 14px;
     }
 }
 
 @media (max-width: 480px) {
     #board {
-        grid-template-columns: repeat(15, 20px); /* Adjust for very small screens */
-        gap: 1px; /* Reduce gap */
+        grid-template-columns: repeat(15, 20px);
     }
 
     .cell {
-        font-size: 6px; /* Minimize font size */
+        font-size: 8px;
+    }
+
+    #game-header {
+        font-size: 14px;
+    }
+
+    #sidebar {
+        font-size: 12px;
     }
 }

@@ -27,41 +27,49 @@
             <button onclick="joinLobby()">Join as Player</button>
             <button onclick="joinAsSpectator()">Join as Spectator</button>
         </div>
-        
-        <!-- Spectator List -->
-        <div id="spectators" style="display: none;">
-            <h3>Spectators</h3>
-            <ul id="spectator-list"></ul>
-        </div>
-             
     </div>
 
     <!-- Game Section -->
     <div id="game-section" style="display: none;">
-        <h3 id="waiting-message" style="color: #888; display: none;">Waiting for another player...</h3>
-        <h2>Lobby: <span id="current-lobby"></span></h2>
-        
-    <h3>Current Turn: <span id="current-turn"></span></h3>
-    <p id="waiting-message" style="display:none; color: red;">Waiting for another player to join...</p>
-        <h4>Time Remaining: <span id="timer">30s</span></h4> <!-- Timer Added -->
-
-        <!-- Sidebar for connected players -->
-        <div id="sidebar" class="sidebar">
-            <h3>Connected Players</h3>
-            <ul id="player-list"></ul> <!-- List of players -->
+        <!-- Game Header -->
+        <div id="game-header">
+            <h2>Lobby ID: <span id="current-lobby"></span></h2>
+            <h3>Turn: <span id="current-turn"></span></h3>
+            <h4>Time Left: <span id="timer">30s</span></h4>
         </div>
-
-        <!-- Game Board -->
-        <div id="board"></div>
-
-        <!-- Winner Notification Modal -->
-        <div id="winnerModal" class="modal" style="display: none;">
+    
+        <!-- Main Game Layout -->
+        <div id="game-layout">
+            <!-- Sidebar -->
+            <div id="sidebar">
+                <h3>Players</h3>
+                <ul id="player-list"></ul>
+                <h3>Spectators</h3>
+                <ul id="spectator-list"></ul>
+            </div>
+    
+            <!-- Game Board Container -->
+            <div id="board-container">
+                <div id="board"></div>
+            </div>
+        </div>
+    
+        <!-- Winner Modal -->
+        <div id="winnerModal" class="modal">
             <div class="modal-content">
                 <h2 id="winnerMessage"></h2>
                 <button onclick="resetGame()">Play Again</button>
             </div>
         </div>
     </div>
+    <!-- Waiting for Opponent Popup -->
+<div id="waitingPopup" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2 id="waitingMessage">Waiting for an opponent to join...</h2>
+    </div>
+</div>
+
+    
 
     <script src="script.js"></script>
 </body>

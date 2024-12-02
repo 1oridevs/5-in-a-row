@@ -5,13 +5,35 @@ const hostOptions = document.getElementById('host-options');
 const joinOptions = document.getElementById('join-options');
 const gameSection = document.getElementById('game-section');
 const currentLobbySpan = document.getElementById('current-lobby');
-const currentTurnSpan = document.getElementById('current-turn'); // Add this line
+const currentTurnSpan = document.getElementById('current-turn');
 const API_BASE_URL = "https://five-in-a-row-ahwe.onrender.com";
 let gameOver = false;
 let gameId = null;
 let userId = Math.random().toString(36).substring(2, 9);
 let nickname = "";
 let currentTurn = null;
+
+// Add "Waiting for Opponent" popup
+const waitingPopup = document.createElement("div");
+waitingPopup.id = "waitingPopup";
+waitingPopup.innerHTML = `
+    <div class="modal-content">
+        <h2 id="waitingMessage">Waiting for an opponent to join...</h2>
+    </div>
+`;
+waitingPopup.style.display = "none";
+document.body.appendChild(waitingPopup);
+
+// Function to show the "Waiting for Opponent" popup
+function showWaitingPopup() {
+    waitingPopup.style.display = "flex";
+}
+
+// Function to hide the "Waiting for Opponent" popup
+function hideWaitingPopup() {
+    waitingPopup.style.display = "none";
+}
+
 // Function to handle the initial choice popup
 function selectOption(option) {
     popup.style.display = 'none';
@@ -43,12 +65,14 @@ async function createLobby() {
         const data = await response.json();
         gameId = data.lobbyId;
         alert(`Lobby created with ID: ${gameId}`);
-        showGameSection();
+
+        showWaitingPopup(); // Show the waiting popup
+        waitForOpponent(); // Start polling for opponent
+
     } catch (error) {
         console.error("Error creating lobby:", error);
     }
 }
-
 
 async function joinLobby() {
     const lobbyId = document.getElementById('lobbyIdInput').value; // Get the lobby ID
@@ -78,43 +102,32 @@ async function joinLobby() {
         console.error("Error joining lobby:", error);
     }
 }
-const playerColors = {};
-
-// Function to assign a unique color to each player
-function getPlayerColor(userId) {
-    if (!playerColors[userId]) {
-        // Assign a color based on the number of players
-        const colors = ['#6a5acd', '#ffa07a', '#ff6347', '#3cb371']; // Add more colors if needed
-        const colorIndex = Object.keys(playerColors).length % colors.length;
-        playerColors[userId] = colors[colorIndex];
-    }
-    return playerColors[userId];
-}
 
 function showGameSection() {
+    hideWaitingPopup(); // Hide the waiting popup
     lobbySection.style.display = 'none';
     gameSection.style.display = 'block';
     currentLobbySpan.textContent = gameId;
 
-    renderBoard(Array(15).fill().map(() => Array(15).fill(" ")), { players: {} }); // Updated to 15x15
+    renderBoard(Array(15).fill().map(() => Array(15).fill(" ")), { players: {} });
     pollBoardState();
 }
 
+// Poll for an opponent to join
+async function waitForOpponent() {
+    const interval = setInterval(async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
+            const data = await response.json();
 
-
-
-function showWinnerPopup(message) {
-    const modal = document.getElementById('winnerModal');
-    const winnerMessage = document.getElementById('winnerMessage');
-
-    winnerMessage.textContent = message;
-    modal.style.display = 'block';
-}
-
-
-function closeModal() {
-    const modal = document.getElementById('winnerModal');
-    modal.style.display = 'none';
+            if (Object.keys(data.players || {}).length === 2) {
+                clearInterval(interval); // Stop polling
+                showGameSection(); // Show the main game section
+            }
+        } catch (error) {
+            console.error("Error polling for opponent:", error);
+        }
+    }, 2000); // Poll every 2 seconds
 }
 
 async function makeMove(column) {
@@ -155,73 +168,25 @@ async function makeMove(column) {
     }
 }
 
-
-async function joinAsSpectator() {
-    const lobbyId = document.getElementById('lobbyIdInput').value;
-    nickname = document.getElementById('joinNicknameInput').value;
-
-    if (!lobbyId || !nickname) {
-        alert("Please enter a lobby ID and nickname");
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/add-spectator`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lobby: lobbyId, userId, nickname })
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-            alert(data.error);
-        } else {
-            gameId = lobbyId;
-            showSpectatorMode();
-        }
-    } catch (error) {
-        console.error("Error joining as spectator:", error);
-    }
-}
-
-function showSpectatorMode() {
-    lobbySection.style.display = 'none';
-    gameSection.style.display = 'block';
-    currentLobbySpan.textContent = gameId;
-    pollBoardState();
-}
-
-function resetGame() {
-    closeModal();
-    window.location.reload(); // For now, just reload the page to reset
-}
-
-
-
-// Function to render the game board
+// Render the game board
 function renderBoard(board, data) {
     boardElement.innerHTML = '';
     const playerList = document.getElementById('player-list');
     playerList.innerHTML = ''; // Clear existing players
 
-    // Safely handle cases where data.players might be undefined
     const players = data.players || {};
 
-    // Update CSS grid template for 15x15 grid
-    boardElement.style.gridTemplateColumns = `repeat(15, 40px)`; // Set column size
-    boardElement.style.gridTemplateRows = `repeat(15, 40px)`; // Set row size
+    boardElement.style.gridTemplateColumns = `repeat(15, 40px)`;
+    boardElement.style.gridTemplateRows = `repeat(15, 40px)`;
 
-    // Render the game board
     board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
             const cellDiv = document.createElement('div');
             cellDiv.className = 'cell';
 
-            // Set the cell's background color and text based on the player
             if (cell !== " ") {
-                cellDiv.style.backgroundColor = getPlayerColor(cell); // Get color for the userId
-                cellDiv.textContent = players[cell] || cell; // Display the nickname if available
+                cellDiv.style.backgroundColor = getPlayerColor(cell);
+                cellDiv.textContent = players[cell] || cell;
             } else {
                 cellDiv.textContent = "";
             }
@@ -231,7 +196,6 @@ function renderBoard(board, data) {
         });
     });
 
-    // Update the player list in the sidebar
     for (const [userId, nickname] of Object.entries(players)) {
         const playerItem = document.createElement('li');
         playerItem.textContent = nickname;
@@ -240,21 +204,26 @@ function renderBoard(board, data) {
 }
 
 
-
-let isWaiting = true;
+function closeModal() {
+    const modal = document.getElementById('winnerModal');
+    modal.style.display = 'none';
+}
 
 async function fetchBoardState() {
     try {
         const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
         const data = await response.json();
 
+        console.log('Game state data:', data); // Debugging statement
+
         if (data.board) {
             renderBoard(data.board, data); // Render the updated board
         }
 
-        if (data.gameOver) {
+        if (data.gameOver && data.winner) {
             gameOver = true; // Stop further updates
-            showWinnerPopup(data.winner);
+            const winnerName = data.players[data.winner] || "Unknown";
+            showWinnerPopup(`Winner: ${winnerName}`);
             return; // Exit early since game is over
         }
 
@@ -275,21 +244,23 @@ async function fetchBoardState() {
     }
 }
 
+function showWinnerPopup(message) {
+    if (!message) return; // Do not show the popup if there is no message
+
+    const modal = document.getElementById('winnerModal');
+    const winnerMessage = document.getElementById('winnerMessage');
+
+    winnerMessage.textContent = message;
+    modal.style.display = 'block';
+}
 
 
 function pollBoardState() {
     const interval = setInterval(() => {
         if (gameOver) {
-            clearInterval(interval); // Stop polling if game is over
+            clearInterval(interval);
         } else {
             fetchBoardState();
         }
     }, 1000);
 }
-
-
-
-
-
-
-
