@@ -96,9 +96,10 @@ function showGameSection() {
     gameSection.style.display = 'block';
     currentLobbySpan.textContent = gameId;
 
-    renderBoard(Array(6).fill().map(() => Array(7).fill(" ")), { players: {} });
+    renderBoard(Array(15).fill().map(() => Array(15).fill(" ")), { players: {} }); // Updated to 15x15
     pollBoardState();
 }
+
 
 
 
