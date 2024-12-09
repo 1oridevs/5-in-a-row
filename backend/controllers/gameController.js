@@ -2,6 +2,7 @@ let lobbies = {};
 
 // Create a new lobby
 exports.createLobby = (req, res) => {
+    let gameOver = false;
     const { userId, nickname } = req.body;
 
     if (!userId || !nickname) {
@@ -32,17 +33,18 @@ exports.joinLobby = (req, res) => {
         return res.status(404).json({ error: "Lobby not found" });
     }
 
-    if (game.gameOver) {
+    if (game.winner) {
         return res.status(400).json({ error: "Cannot join. The game is already over." });
     }
 
     if (Object.keys(game.players).length < 2) {
         game.players[userId] = nickname;
 
-        // Start the game when the second player joins
         if (Object.keys(game.players).length === 2) {
-            game.currentPlayer = Object.keys(game.players)[0]; // Set the first player as current
-            game.moveDeadline = Date.now() + 30000; // Start 30-second timer
+            game.currentPlayer = Object.keys(game.players)[0]; // First player
+            game.moveDeadline = Date.now() + 30000; // Set timer
+            game.gameOver = false; // Explicit reset
+            game.winner = null; // Reset winner
             console.log("Game started!");
         }
 
@@ -50,7 +52,6 @@ exports.joinLobby = (req, res) => {
         return res.json({ message: "Joined as player", lobbyId: lobby });
     }
 
-    // Add as a spectator
     game.spectators[userId] = nickname;
     console.log(`Spectator joined: Lobby ID: ${lobby}, User ID: ${userId}, Nickname: ${nickname}`);
     return res.json({ message: "Joined as spectator", lobbyId: lobby });
@@ -65,7 +66,7 @@ exports.makeMove = (req, res) => {
 
     if (!game) return res.status(404).json({ error: "Lobby not found" });
 
-    if (game.gameOver) {
+    if (game.winner) {
         return res.status(400).json({ error: "Game is over. No moves allowed." });
     }
 
@@ -92,7 +93,6 @@ exports.makeMove = (req, res) => {
     }
 
     if (checkWin(board, userId)) {
-        game.gameOver = true;
         game.winner = userId; // Set the winner
         game.winMessage = `${game.players[userId]} wins!`;
         console.log(game.winMessage);
@@ -104,10 +104,12 @@ exports.makeMove = (req, res) => {
     res.json({
         board: game.board,
         currentPlayer: game.currentPlayer,
+        winner: game.winner || null, // Include winner in the response
         message: game.winMessage || null,
         moveDeadline: game.moveDeadline,
     });
 };
+
 
 
 // Check timer
@@ -184,9 +186,6 @@ function checkWin(board, userId) {
 }
 
 
-    
-
-
 exports.getGameState = (req, res) => {
     const { lobby } = req.params;
     const game = lobbies[lobby];
@@ -195,16 +194,24 @@ exports.getGameState = (req, res) => {
         return res.status(404).json({ error: "Lobby not found" });
     }
 
+    console.log('Serving game state:', {
+        gameOver: !!game.winner,
+        winner: game.winner || null,
+    });
+
     res.json({
         board: game.board,
         currentPlayer: game.currentPlayer,
         players: game.players,
-        spectators: game.spectators || {}, // Include spectators in the state
-        gameOver: game.gameOver || false,
-        winner: game.winner || null,
-        moveDeadline: game.gameOver ? null : game.moveDeadline || Date.now(),
-        });
+        spectators: game.spectators || {},
+        winner: game.winner || null, // Add winner to the response
+        gameOver: !!game.winner, // Derive gameOver from winner presence
+        moveDeadline: game.winner ? null : game.moveDeadline || Date.now(),
+    });
 };
+
+
+
 
 // Join as a spectator
 exports.joinAsSpectator = (req, res) => {

@@ -6,12 +6,26 @@ const joinOptions = document.getElementById('join-options');
 const gameSection = document.getElementById('game-section');
 const currentLobbySpan = document.getElementById('current-lobby');
 const currentTurnSpan = document.getElementById('current-turn');
-const API_BASE_URL = "https://five-in-a-row-ahwe.onrender.com";
+const API_BASE_URL = "http://localhost:5001";
 let gameOver = false;
 let gameId = null;
 let userId = Math.random().toString(36).substring(2, 9);
 let nickname = "";
 let currentTurn = null;
+let winner = null;
+const playerColors = {};
+
+// Function to assign a unique color to each player
+function getPlayerColor(userId) {
+    if (!playerColors[userId]) {
+        // Define a palette of colors
+        const colors = ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3', '#33FFF3', '#F3A033'];
+        // Assign a color based on the number of players
+        const colorIndex = Object.keys(playerColors).length % colors.length;
+        playerColors[userId] = colors[colorIndex];
+    }
+    return playerColors[userId];
+}
 
 // Add "Waiting for Opponent" popup
 const waitingPopup = document.createElement("div");
@@ -104,7 +118,7 @@ async function joinLobby() {
 }
 
 function showGameSection() {
-    hideWaitingPopup(); // Hide the waiting popup
+    hideWaitingPopup(); // Ensure the waiting popup is hidden
     lobbySection.style.display = 'none';
     gameSection.style.display = 'block';
     currentLobbySpan.textContent = gameId;
@@ -113,6 +127,7 @@ function showGameSection() {
     pollBoardState();
 }
 
+
 // Poll for an opponent to join
 async function waitForOpponent() {
     const interval = setInterval(async () => {
@@ -120,15 +135,18 @@ async function waitForOpponent() {
             const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
             const data = await response.json();
 
+            // Check if two players are in the lobby
             if (Object.keys(data.players || {}).length === 2) {
                 clearInterval(interval); // Stop polling
-                showGameSection(); // Show the main game section
+                hideWaitingPopup(); // Hide the waiting popup
+                showGameSection(); // Start the game
             }
         } catch (error) {
             console.error("Error polling for opponent:", error);
         }
     }, 2000); // Poll every 2 seconds
 }
+
 
 async function makeMove(column) {
     if (gameOver) {
@@ -206,7 +224,10 @@ function renderBoard(board, data) {
 
 function closeModal() {
     const modal = document.getElementById('winnerModal');
-    modal.style.display = 'none';
+    if (modal.style.display !== 'none') {
+        console.log('Hiding winner modal.');
+        modal.style.display = 'none';
+    }
 }
 
 async function fetchBoardState() {
@@ -214,26 +235,35 @@ async function fetchBoardState() {
         const response = await fetch(`${API_BASE_URL}/api/game-state/${gameId}`);
         const data = await response.json();
 
-        console.log('Game state data:', data); // Debugging statement
+        console.log('Game state fetched:', data);
 
+        // Render board and update players
         if (data.board) {
-            renderBoard(data.board, data); // Render the updated board
+            renderBoard(data.board, data);
         }
 
+        // Ensure winner modal shows only when gameOver === true and winner is not null
         if (data.gameOver && data.winner) {
-            gameOver = true; // Stop further updates
+            console.log('Displaying winner modal: ', data.winner);
+            gameOver = true;
             const winnerName = data.players[data.winner] || "Unknown";
             showWinnerPopup(`Winner: ${winnerName}`);
-            return; // Exit early since game is over
+            return; // Stop further actions
         }
 
-        // Update the current turn
+        // Ensure modal doesn't show if gameOver is false
+        if (!data.gameOver) {
+            console.log('Game is not over, clearing modal if visible.');
+            closeModal(); // Hide the modal if displayed by mistake
+        }
+
+        // Update current turn
         if (data.currentPlayer && data.players) {
             currentTurn = data.currentPlayer;
             currentTurnSpan.textContent = data.players[data.currentPlayer] || "Waiting...";
         }
 
-        // Update the timer
+        // Update timer
         if (data.moveDeadline) {
             const timerElement = document.getElementById('timer');
             const timeRemaining = Math.max(0, Math.floor((data.moveDeadline - Date.now()) / 1000));
@@ -245,22 +275,33 @@ async function fetchBoardState() {
 }
 
 function showWinnerPopup(message) {
-    if (!message) return; // Do not show the popup if there is no message
+    if (!message) {
+        console.log('No valid winner message, modal not shown.');
+        return; // Prevent modal from showing without a message
+    }
 
     const modal = document.getElementById('winnerModal');
     const winnerMessage = document.getElementById('winnerMessage');
 
+    console.log('Setting winner modal with message: ', message);
     winnerMessage.textContent = message;
     modal.style.display = 'block';
 }
 
 
+
 function pollBoardState() {
     const interval = setInterval(() => {
         if (gameOver) {
+            console.log('Game over. Stopping polling.');
             clearInterval(interval);
         } else {
             fetchBoardState();
         }
     }, 1000);
+}
+
+
+function resetGame() {
+    window.location.reload();
 }
