@@ -236,5 +236,3 @@ start_game()
 ```
 
 ---
-
-This guide ensures developers have everything they need to create a fully functional client. Let me know if additional enhancements or clarifications are needed!
